@@ -26,3 +26,6 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Demo build output (docs/index.html is committed; this fragment is not)
+web/artifact.html
