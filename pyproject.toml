@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "entropy-prune"
+version = "0.1.0"
+description = "High-efficiency LLM context pruning via Shannon entropy, SVD subspace decomposition, and cosine similarity scoring."
+readme = "README.md"
+requires-python = ">=3.10,<3.14"
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.26",
+    "torch>=2.2",
+    "sentence-transformers>=3.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "ANN"]
+
+[tool.ruff.lint.per-file-ignores]
+# Demo scripts favour linear-algebra naming (E, S, H, M) over PEP-8 lowercase,
+# and are read top-to-bottom rather than imported, so annotations add noise.
+"examples/*" = ["ANN", "N803", "N806"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,539 @@
+<title>Spectral Context Pruner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --page:#f3f4f6; --surface:#fbfcfd; --sunk:#eceef2;
+  --ink:#0d1117; --ink-2:#4e5560; --ink-3:#858c96;
+  --grid:#dde2e8; --rule:#c9d0d9; --ring:rgba(13,17,23,.10);
+  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.12);
+  --warn:#b3541e; --good:#0a7d36;
+  --hm0:#e3e7ee; --hmp:#cde2fb,#9ec5f4,#5598e7,#2a78d6,#184f95,#0d366b;
+  --shadow:0 1px 2px rgba(13,17,23,.05),0 8px 24px -12px rgba(13,17,23,.16);
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --page:#0b0d10; --surface:#14171c; --sunk:#1b1f25;
+  --ink:#eef1f5; --ink-2:#a4adb9; --ink-3:#767e8a;
+  --grid:#242a32; --rule:#2e353e; --ring:rgba(238,241,245,.12);
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.18);
+  --warn:#e0955f; --good:#3fb36a;
+  --hm0:#232931;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --page:#0b0d10; --surface:#14171c; --sunk:#1b1f25;
+  --ink:#eef1f5; --ink-2:#a4adb9; --ink-3:#767e8a;
+  --grid:#242a32; --rule:#2e353e; --ring:rgba(238,241,245,.12);
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.18);
+  --warn:#e0955f; --good:#3fb36a;
+  --hm0:#1b1f25;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--ink);font-family:var(--sans);
+  font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px 28px;
+  padding-bottom:18px;border-bottom:1px solid var(--rule);margin-bottom:22px}
+.mast h1{font-family:var(--mono);font-weight:600;font-size:23px;letter-spacing:-.02em;
+  margin:0;text-wrap:balance}
+.mast p{margin:6px 0 0;color:var(--ink-2);max-width:62ch;font-size:13.5px}
+.stamp{font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  letter-spacing:.06em;text-transform:uppercase;margin-left:auto;text-align:right;
+  line-height:1.7;white-space:nowrap}
+
+/* ---------- metric strip ---------- */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px;background:var(--surface);outline:1px solid var(--rule);border:1px solid var(--rule);
+  border-radius:3px;overflow:hidden;margin-bottom:22px}
+.metric{background:var(--surface);padding:12px 14px 13px}
+.metric .lab{font-family:var(--mono);font-size:10.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:5px}
+.metric .val{font-family:var(--mono);font-size:26px;font-weight:500;
+  letter-spacing:-.02em;line-height:1.05;display:block}
+.metric .sub{font-family:var(--mono);font-size:11px;color:var(--ink-2);
+  display:block;margin-top:3px}
+.metric.lead .val{color:var(--accent)}
+
+/* ---------- layout ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:880px){.cols{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  box-shadow:var(--shadow)}
+.panel > h2{font-family:var(--mono);font-size:11.5px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2);
+  margin:0;padding:11px 14px;border-bottom:1px solid var(--grid)}
+.panel .body{padding:14px}
+.note{font-size:12.5px;color:var(--ink-2);margin:10px 0 0;line-height:1.5}
+.note b{color:var(--ink);font-weight:600}
+
+/* ---------- corpus list ---------- */
+.chunks{list-style:none;margin:0;padding:0;max-height:520px;overflow-y:auto}
+.chunk{display:grid;grid-template-columns:26px 1fr auto;gap:9px;align-items:baseline;
+  width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--grid);
+  padding:8px 14px;cursor:pointer;color:inherit;font:inherit}
+.chunk:last-child{border-bottom:0}
+.chunk:hover{background:var(--sunk)}
+.chunk:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.chunk .ix{font-family:var(--mono);font-size:11px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.chunk .tx{font-size:12.5px;line-height:1.42}
+.chunk .tg{font-family:var(--mono);font-size:10px;color:var(--ink-3);
+  letter-spacing:.05em;text-transform:uppercase}
+.chunk[data-state="off"]{opacity:.36}
+.chunk[data-state="off"] .tx{text-decoration:line-through}
+.chunk[data-state="kept"] .ix{color:var(--accent);font-weight:600}
+.chunk[data-state="kept"]{box-shadow:inset 3px 0 0 var(--accent)}
+.chunk[data-state="cut"] .tx{color:var(--ink-2)}
+.chunk[data-state="cut"] .ix{color:var(--warn)}
+
+/* ---------- controls ---------- */
+.ctrls{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--grid)}
+button.bt{font-family:var(--mono);font-size:11px;letter-spacing:.03em;
+  background:var(--surface);color:var(--ink-2);border:1px solid var(--rule);
+  border-radius:2px;padding:5px 9px;cursor:pointer}
+button.bt:hover{border-color:var(--accent);color:var(--ink)}
+button.bt:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+button.bt[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);
+  color:var(--ink);font-weight:500}
+.sliders{display:grid;gap:12px;padding:13px 14px;border-bottom:1px solid var(--grid)}
+.sl{display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}
+.sl label{font-family:var(--mono);font-size:11px;letter-spacing:.05em;
+  text-transform:uppercase;color:var(--ink-3)}
+.sl output{font-family:var(--mono);font-size:14px;font-weight:500;
+  font-variant-numeric:tabular-nums}
+.sl input{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:0}
+.sl input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* ---------- heatmap ---------- */
+.hm-shell{overflow-x:auto;padding-bottom:2px}
+.hm{display:grid;gap:1px;width:100%;min-width:280px}
+.cell{aspect-ratio:1;width:100%;border-radius:1px;cursor:crosshair}
+.cell.off{opacity:.14}
+.cell.keep{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.cell.diag{box-shadow:inset 0 0 0 1px var(--ring)}
+.hm-legend{display:flex;align-items:center;gap:9px;margin-top:11px;
+  font-family:var(--mono);font-size:10.5px;color:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.hm-ramp{height:9px;flex:1;max-width:230px;border-radius:2px;border:1px solid var(--ring)}
+
+/* ---------- spectrum ---------- */
+.spec{width:100%;height:auto;display:block;overflow:visible}
+.spec text{font-family:var(--mono);font-size:9.5px;fill:var(--ink-3);
+  font-variant-numeric:tabular-nums}
+.spec .ax{stroke:var(--rule);stroke-width:1}
+.spec .gl{stroke:var(--grid);stroke-width:1}
+.spec .bar{fill:var(--accent)}
+.spec .bar.cut{fill:var(--ink-3);opacity:.42}
+.spec .bar:hover{fill:var(--ink)}
+
+/* ---------- tooltip ---------- */
+#tip{position:fixed;z-index:50;pointer-events:none;opacity:0;transition:opacity .1s;
+  background:var(--surface);border:1px solid var(--rule);border-radius:3px;
+  box-shadow:var(--shadow);padding:9px 11px;max-width:330px;font-size:12px;
+  line-height:1.45;color:var(--ink)}
+#tip .v{font-family:var(--mono);font-size:15px;font-weight:600;display:block;
+  margin-bottom:5px;font-variant-numeric:tabular-nums}
+#tip .q{color:var(--ink-2);font-size:11.5px;display:block;margin-top:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- output table ---------- */
+.kv{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12px;
+  font-variant-numeric:tabular-nums}
+.kv th{text-align:left;font-weight:600;font-size:10.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ink-3);padding:0 10px 7px 0;
+  border-bottom:1px solid var(--grid)}
+.kv td{padding:7px 10px 7px 0;border-bottom:1px solid var(--grid)}
+.kv tr:last-child td{border-bottom:0}
+.kv td.n{text-align:right;padding-right:0}
+.win{color:var(--good);font-weight:600}
+.lose{color:var(--warn)}
+.foot{margin-top:24px;padding-top:16px;border-top:1px solid var(--rule);
+  font-size:12.5px;color:var(--ink-2);max-width:76ch}
+.foot code{font-family:var(--mono);font-size:11.5px;background:var(--sunk);
+  padding:1px 5px;border-radius:2px}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <h1>Spectral Context Pruner</h1>
+      <p>Twenty real context chunks, embedded with all-MiniLM-L6-v2. Toggle chunks
+         and watch the eigenvalue spectrum, the entropy, and the effective rank
+         respond. Every number is computed live in your browser from the actual
+         similarity matrix.</p>
+    </div>
+    <div class="stamp">all-MiniLM-L6-v2<br>384 dims &middot; 20 chunks<br>cosine &middot; jacobi &middot; shannon</div>
+  </header>
+
+  <div class="metrics" id="metrics"></div>
+
+  <div class="cols">
+    <section class="panel">
+      <h2>Context window</h2>
+      <div class="ctrls">
+        <button class="bt" data-preset="all">All 20</button>
+        <button class="bt" data-preset="nodup">Drop near-duplicates</button>
+        <button class="bt" data-preset="onetopic">One topic only</button>
+        <button class="bt" data-preset="spread">One per topic</button>
+      </div>
+      <ul class="chunks" id="chunks"></ul>
+    </section>
+
+    <div style="display:grid;gap:22px;min-width:0">
+      <section class="panel">
+        <h2>Pruner</h2>
+        <div class="ctrls">
+          <button class="bt" data-method="greedy" aria-pressed="true">Greedy coverage</button>
+          <button class="bt" data-method="thresh" aria-pressed="false">Threshold dedup</button>
+        </div>
+        <div class="sliders">
+          <div class="sl">
+            <label for="budget">Keep</label><output id="budgetOut">8</output>
+            <input type="range" id="budget" min="1" max="20" value="8" step="1">
+          </div>
+          <div class="sl" id="tauRow" hidden>
+            <label for="tau">Cosine threshold</label><output id="tauOut">0.50</output>
+            <input type="range" id="tau" min="0.05" max="0.95" value="0.50" step="0.01">
+          </div>
+        </div>
+        <div class="body">
+          <table class="kv"><thead><tr>
+            <th>Method</th><th class="n">Kept</th><th class="n">Coverage</th>
+            <th class="n">Eff. rank</th><th class="n">Tokens</th>
+          </tr></thead><tbody id="cmp"></tbody></table>
+          <p class="note" id="verdict"></p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Cosine similarity matrix &mdash; S = E E&#7488;</h2>
+        <div class="body">
+          <div class="hm-shell"><div class="hm" id="hm"></div></div>
+          <div class="hm-legend">
+            <span>&minus;0.2</span><div class="hm-ramp" id="ramp"></div><span>+1.0</span>
+            <span style="margin-left:auto">ringed = kept by pruner</span>
+          </div>
+          <p class="note">Each cell is the cosine between two chunks. Zero is the
+             neutral midpoint &mdash; unrelated chunks sit near it, so the
+             <b>bright blocks are the redundancy</b>. Hover any cell for the pair.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Eigenvalue spectrum of S</h2>
+        <div class="body">
+          <svg class="spec" id="spec" viewBox="0 0 660 220" role="img"
+               aria-label="Eigenvalues of the active similarity matrix, largest first"></svg>
+          <p class="note">Eigenvalues are the squared singular values of E, sorted
+             largest first, and they always sum to <b>n</b> because the diagonal of S
+             is exactly 1. Dividing them by n gives a probability distribution for
+             free &mdash; that is what Shannon entropy consumes. A tall first bar with
+             a long flat tail means <b>the context says one thing repeatedly</b>.</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <p class="foot">Effective rank is <code>exp(H)</code> where
+     <code>H = &minus;&Sigma; p&#7522; log p&#7522;</code> and <code>p = &lambda;/n</code>.
+     It answers &ldquo;how many genuinely distinct things are in this context?&rdquo;
+     &mdash; a continuous count, not an integer. Twenty identical chunks score 1.0;
+     twenty unrelated chunks score 20.0. Eigenvalues are computed with a cyclic
+     Jacobi rotation solver; the similarity matrix was precomputed once from the
+     real encoder, and every subset you select is a principal submatrix of it.</p>
+</div>
+
+<div id="tip" role="tooltip"></div>
+
+<script>
+__DATA__
+
+/* ---------- linear algebra ---------- */
+function subMatrix(idx){
+  return idx.map(i => idx.map(j => SIM[i][j]));
+}
+/** Cyclic Jacobi eigenvalue solver for symmetric matrices. Exact enough at n<=20. */
+function eigenvalues(M){
+  const n = M.length;
+  if(n === 0) return [];
+  if(n === 1) return [M[0][0]];
+  const a = M.map(r => r.slice());
+  for(let sweep = 0; sweep < 60; sweep++){
+    let off = 0;
+    for(let i = 0; i < n; i++) for(let j = i+1; j < n; j++) off += a[i][j]*a[i][j];
+    if(off < 1e-18) break;
+    for(let p = 0; p < n; p++) for(let q = p+1; q < n; q++){
+      if(Math.abs(a[p][q]) < 1e-16) continue;
+      const theta = (a[q][q] - a[p][p]) / (2*a[p][q]);
+      const sgn = theta >= 0 ? 1 : -1;
+      const t = sgn / (Math.abs(theta) + Math.sqrt(theta*theta + 1));
+      const c = 1/Math.sqrt(t*t + 1), s = t*c;
+      for(let k = 0; k < n; k++){
+        const kp = a[k][p], kq = a[k][q];
+        a[k][p] = c*kp - s*kq; a[k][q] = s*kp + c*kq;
+      }
+      for(let k = 0; k < n; k++){
+        const pk = a[p][k], qk = a[q][k];
+        a[p][k] = c*pk - s*qk; a[q][k] = s*pk + c*qk;
+      }
+    }
+  }
+  return a.map((r,i) => r[i]).sort((x,y) => y - x);
+}
+function entropy(lams){
+  const tot = lams.reduce((s,v) => s + Math.max(v,0), 0);
+  if(tot <= 0) return 0;
+  let H = 0;
+  for(const l of lams){
+    const p = Math.max(l,0)/tot;
+    if(p > 1e-12) H -= p*Math.log(p);
+  }
+  return H;
+}
+const effRank = idx => idx.length ? Math.exp(entropy(eigenvalues(subMatrix(idx)))) : 0;
+
+/* ---------- selection ---------- */
+/** Greedy facility location: each pick maximally improves worst-case representation. */
+function greedySelect(idx, k){
+  const sel = [], best = new Map(idx.map(i => [i, -Infinity]));
+  const pool = new Set(idx);
+  while(sel.length < Math.min(k, idx.length)){
+    let pick = null, top = -Infinity;
+    for(const c of pool){
+      let gain = 0;
+      for(const i of idx) gain += Math.max(best.get(i), SIM[i][c]);
+      if(gain > top){ top = gain; pick = c; }
+    }
+    sel.push(pick); pool.delete(pick);
+    for(const i of idx) best.set(i, Math.max(best.get(i), SIM[i][pick]));
+  }
+  return sel.sort((a,b) => a-b);
+}
+function thresholdSelect(idx, tau, k){
+  const sel = [];
+  for(const c of idx){
+    if(sel.length >= k) break;
+    if(sel.every(j => SIM[c][j] < tau)) sel.push(c);
+  }
+  return sel;
+}
+function coverage(idx, sel){
+  if(!sel.length || !idx.length) return 0;
+  let s = 0;
+  for(const i of idx) s += Math.max(...sel.map(j => SIM[i][j]));
+  return s / idx.length;
+}
+const tokensOf = list => list.reduce((s,i) => s + CHUNKS[i].k, 0);
+
+/* ---------- colour ramp (diverging, neutral at 0) ---------- */
+const RAMP = {
+  light:{ zero:'#e3e7ee',
+    pos:['#cde2fb','#9ec5f4','#5598e7','#2a78d6','#184f95','#0d366b'],
+    neg:['#e8a8a8','#d03b3b'] },
+  dark:{ zero:'#232931',
+    pos:['#184f95','#256abf','#3987e5','#6da7ec','#9ec5f4','#cde2fb'],
+    neg:['#8a4a4a','#e66767'] }
+};
+const hex2rgb = h => [1,3,5].map(i => parseInt(h.slice(i,i+2),16));
+const mix = (a,b,t) => `rgb(${hex2rgb(a).map((v,i)=>Math.round(v+(hex2rgb(b)[i]-v)*t)).join(',')})`;
+function isDark(){
+  const stamp = document.documentElement.getAttribute('data-theme');
+  if(stamp === 'dark') return true;
+  if(stamp === 'light') return false;
+  return matchMedia('(prefers-color-scheme: dark)').matches;
+}
+function cellColor(v){
+  const r = isDark() ? RAMP.dark : RAMP.light;
+  if(v >= 0){
+    const t = Math.min(v, 1) * r.pos.length;
+    const i = Math.min(Math.floor(t), r.pos.length - 1);
+    const from = i === 0 ? r.zero : r.pos[i-1];
+    return mix(from, r.pos[i], t - i);
+  }
+  const t = Math.min(-v / 0.2, 1) * r.neg.length;
+  const i = Math.min(Math.floor(t), r.neg.length - 1);
+  const from = i === 0 ? r.zero : r.neg[i-1];
+  return mix(from, r.neg[i], t - i);
+}
+
+/* ---------- state ---------- */
+const N = CHUNKS.length;
+const state = { on:new Set(CHUNKS.map((_,i)=>i)), method:'greedy', k:8, tau:0.5 };
+const $ = id => document.getElementById(id);
+const tip = $('tip');
+
+function showTip(html, ev){
+  tip.innerHTML = html; tip.style.opacity = '1';
+  const r = tip.getBoundingClientRect();
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if(x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+  if(y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const hideTip = () => { tip.style.opacity = '0'; };
+
+/* ---------- render ---------- */
+function render(){
+  const idx = [...state.on].sort((a,b) => a-b);
+  const k = Math.min(state.k, Math.max(idx.length, 1));
+
+  const gSel = greedySelect(idx, k);
+  const tSel = thresholdSelect(idx, state.tau, k);
+  const sel = state.method === 'greedy' ? gSel : tSel;
+  const selSet = new Set(sel);
+
+  const erAll = effRank(idx), erSel = effRank(sel);
+  const tokAll = tokensOf(idx), tokSel = tokensOf(sel);
+
+  /* metrics */
+  $('metrics').innerHTML = [
+    ['Chunks active', idx.length, `of ${N} in corpus`],
+    ['Effective rank', erAll.toFixed(2), `exp(H), H = ${entropy(eigenvalues(subMatrix(idx))).toFixed(3)} nats`],
+    ['Redundancy', idx.length ? ((1 - erAll/idx.length)*100).toFixed(0) + '%' : '—',
+      'share of chunks that are echoes'],
+    ['Kept by pruner', sel.length, `${erSel.toFixed(2)} effective rank retained`],
+    ['Tokens', tokSel, tokAll ? `${tokAll} before &middot; ${Math.round((1-tokSel/tokAll)*100)}% cut` : '—']
+  ].map(([l,v,s],i) =>
+    `<div class="metric${i===1?' lead':''}"><span class="lab">${l}</span>
+     <span class="val">${v}</span><span class="sub">${s}</span></div>`).join('');
+
+  /* corpus list */
+  $('chunks').innerHTML = CHUNKS.map((c,i) => {
+    const st = !state.on.has(i) ? 'off' : selSet.has(i) ? 'kept' : 'cut';
+    return `<li><button class="chunk" data-i="${i}" data-state="${st}"
+      aria-pressed="${state.on.has(i)}">
+      <span class="ix">${String(i).padStart(2,'0')}</span>
+      <span class="tx">${c.t}</span><span class="tg">${c.g}</span></button></li>`;
+  }).join('');
+
+  /* comparison table */
+  const row = (name, s, active) => {
+    const er = effRank(s);
+    return `<tr${active?' style="background:var(--accent-soft)"':''}>
+      <td>${name}</td><td class="n">${s.length}</td>
+      <td class="n">${coverage(idx,s).toFixed(3)}</td>
+      <td class="n">${er.toFixed(2)}</td><td class="n">${tokensOf(s)}</td></tr>`;
+  };
+  $('cmp').innerHTML = row('Greedy coverage', gSel, state.method==='greedy')
+                     + row(`Threshold &ge; ${state.tau.toFixed(2)}`, tSel, state.method==='thresh');
+  const cg = coverage(idx,gSel), ct = coverage(idx,tSel);
+  $('verdict').innerHTML = tSel.length < k
+    ? `Threshold dedup could only find <b>${tSel.length}</b> chunks under the
+       budget of ${k} &mdash; raising the cutoff starves it, lowering it lets
+       duplicates back in. Greedy coverage always fills the budget and scores
+       <b>${cg.toFixed(3)}</b> coverage against ${ct.toFixed(3)}.`
+    : `Both filled the budget. Greedy coverage scores
+       <b class="${cg>=ct?'win':'lose'}">${cg.toFixed(3)}</b> against
+       <b>${ct.toFixed(3)}</b> &mdash; it picks the set that best represents
+       everything you dropped, rather than whatever survives a cutoff.`;
+
+  drawHeat(idx, selSet);
+  drawSpectrum(idx, sel.length);
+  $('ramp').style.background =
+    `linear-gradient(90deg, ${cellColor(-0.2)}, ${cellColor(0)} 17%, ${cellColor(0.5)}, ${cellColor(1)})`;
+}
+
+function drawHeat(idx, selSet){
+  const hm = $('hm');
+  hm.style.gridTemplateColumns = `repeat(${N}, 1fr)`;
+  let html = '';
+  for(let i = 0; i < N; i++) for(let j = 0; j < N; j++){
+    const live = state.on.has(i) && state.on.has(j);
+    const kept = selSet.has(i) && selSet.has(j);
+    html += `<div class="cell${!live ? ' off' : (kept ? ' keep' : '')}${i===j?' diag':''}"
+      style="background:${live?cellColor(SIM[i][j]):'var(--hm0)'}"
+      data-i="${i}" data-j="${j}"></div>`;
+  }
+  hm.innerHTML = html;
+}
+
+function drawSpectrum(idx, keep){
+  const svg = $('spec'), W = 660, H = 220, L = 34, R = 8, T = 12, B = 30;
+  const lams = idx.length ? eigenvalues(subMatrix(idx)) : [];
+  if(!lams.length){ svg.innerHTML = ''; return; }
+  const max = Math.max(...lams, 1);
+  const step = Math.pow(10, Math.floor(Math.log10(max)));
+  const tick = max/step > 5 ? 2*step : max/step > 2 ? step : step/2;
+  const pw = (W - L - R) / lams.length, bw = Math.max(3, pw - 3);
+  const y = v => H - B - (v/max) * (H - T - B);
+
+  let g = '';
+  for(let t = 0; t <= max + 1e-9; t += tick){
+    g += `<line class="gl" x1="${L}" y1="${y(t).toFixed(1)}" x2="${W-R}" y2="${y(t).toFixed(1)}"/>
+          <text x="${L-6}" y="${(y(t)+3.2).toFixed(1)}" text-anchor="end">${t.toFixed(1)}</text>`;
+  }
+  lams.forEach((v,i) => {
+    const x = L + i*pw + (pw-bw)/2, h = Math.max(1, H - B - y(Math.max(v,0)));
+    g += `<rect class="bar${i >= keep ? ' cut' : ''}" x="${x.toFixed(1)}"
+      y="${y(Math.max(v,0)).toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}"
+      rx="1.5" data-e="${i}" data-v="${v.toFixed(4)}"><title>λ${i+1} = ${v.toFixed(4)}</title></rect>`;
+    if(i === 0 || i === lams.length-1 || (i+1) % 5 === 0)
+      g += `<text x="${(x+bw/2).toFixed(1)}" y="${H-B+13}" text-anchor="middle">${i+1}</text>`;
+  });
+  g += `<line class="ax" x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}"/>
+        <text x="${L}" y="${H-6}" text-anchor="start">component (largest first)</text>
+        <text x="${W-R}" y="${H-6}" text-anchor="end">bars ${keep+1}+ are what the pruner drops</text>`;
+  svg.innerHTML = g;
+}
+
+/* ---------- events ---------- */
+$('chunks').addEventListener('click', e => {
+  const b = e.target.closest('.chunk'); if(!b) return;
+  const i = +b.dataset.i;
+  state.on.has(i) ? state.on.delete(i) : state.on.add(i);
+  render();
+});
+$('hm').addEventListener('mousemove', e => {
+  const c = e.target.closest('.cell'); if(!c) return hideTip();
+  const i = +c.dataset.i, j = +c.dataset.j;
+  showTip(`<span class="v">${SIM[i][j] >= 0 ? '+' : ''}${SIM[i][j].toFixed(3)}</span>
+    <span class="q">${String(i).padStart(2,'0')} &middot; ${CHUNKS[i].t}</span>
+    <span class="q">${String(j).padStart(2,'0')} &middot; ${CHUNKS[j].t}</span>`, e);
+});
+$('hm').addEventListener('mouseleave', hideTip);
+$('spec').addEventListener('mousemove', e => {
+  const r = e.target.closest('.bar'); if(!r) return hideTip();
+  const i = +r.dataset.e, v = +r.dataset.v, n = state.on.size;
+  showTip(`<span class="v">λ${i+1} = ${v.toFixed(4)}</span>
+    <span class="q">carries ${(v/n*100).toFixed(1)}% of the spectrum</span>`, e);
+});
+$('spec').addEventListener('mouseleave', hideTip);
+
+document.querySelectorAll('[data-method]').forEach(b => b.addEventListener('click', () => {
+  state.method = b.dataset.method;
+  document.querySelectorAll('[data-method]').forEach(o =>
+    o.setAttribute('aria-pressed', String(o === b)));
+  $('tauRow').hidden = state.method !== 'thresh';
+  render();
+}));
+$('budget').addEventListener('input', e => {
+  state.k = +e.target.value; $('budgetOut').textContent = state.k; render();
+});
+$('tau').addEventListener('input', e => {
+  state.tau = +e.target.value; $('tauOut').textContent = state.tau.toFixed(2); render();
+});
+
+const PRESETS = {
+  all:  () => CHUNKS.map((_,i) => i),
+  nodup:() => CHUNKS.map((_,i) => i).filter(i => ![1,3,6].includes(i)),
+  onetopic: () => CHUNKS.map((_,i) => i).filter(i => CHUNKS[i].g === 'policy'),
+  spread: () => { const seen = new Set(); return CHUNKS.map((_,i)=>i)
+    .filter(i => !seen.has(CHUNKS[i].g) && seen.add(CHUNKS[i].g)); }
+};
+document.querySelectorAll('[data-preset]').forEach(b => b.addEventListener('click', () => {
+  state.on = new Set(PRESETS[b.dataset.preset]());
+  state.k = Math.min(state.k, Math.max(state.on.size, 1));
+  $('budget').value = state.k; $('budgetOut').textContent = state.k;
+  render();
+}));
+
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+new MutationObserver(render).observe(document.documentElement, {attributeFilter:['data-theme']});
+render();
+</script>
