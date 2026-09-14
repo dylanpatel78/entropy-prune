@@ -29,3 +29,6 @@ Thumbs.db
 
 # Demo build output (docs/index.html is committed; this fragment is not)
 web/artifact.html
+
+# Guide build fragment (docs/guide.html is committed)
+guide/artifact.html

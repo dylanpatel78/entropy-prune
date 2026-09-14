@@ -12,6 +12,10 @@ embedding matrix rather than by a hand-tuned similarity threshold.**
 context chunks and watch the similarity matrix, eigenvalue spectrum, and effective
 rank respond in real time. Runs entirely in the browser; no backend.
 
+**[→ Field guide](https://dylanpatel78.github.io/entropy-prune/guide.html)** — the
+full theory behind every module, from vector geometry to submodular selection, with
+interactive figures and self-test questions. Written to be explained out loud.
+
 ---
 
 ## The problem
@@ -195,6 +199,13 @@ shipping 384-dimensional vectors.
 - `web/demo.src.html` — source, with a `__DATA__` injection point
 - `web/build.py` — inlines the data, emits both builds
 - `docs/index.html` — standalone build, served by GitHub Pages
+
+`guide/` builds the field guide the same way (`guide/build.py` → `docs/guide.html`).
+It is a single dependency-free file with three interactive figures — a cosine
+explorer, an Eckart–Young rank-truncation demo, and an effective-rank calculator —
+plus collapsible self-test questions. Study progress persists per reader via
+`localStorage`, upgrading to shared storage when the page is served somewhere that
+provides it.
 
 ## License
 

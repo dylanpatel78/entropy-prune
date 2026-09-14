@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --bg: #e8e8e3;
+  --surface: #f7f7f4;
+  --raised: #ffffff;
+  --fg: #141414;
+  --fg-2: #6e7174;
+  --fg-3: #9a9da0;
+  --line: #dededa;
+  --line-strong: #c9c9c3;
+  --build: #0b54e8;
+  --outcome: #c4470a;
+  --outcome-fill: #ff7a2e;
+  --on-fill: #2b1405;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f0f0f;
+    --surface: #1b1b1b;
+    --raised: #242424;
+    --fg: #f7f7f5;
+    --fg-2: #8b8e90;
+    --fg-3: #5c5f61;
+    --line: #2e2e2e;
+    --line-strong: #3d3d3d;
+    --build: #3d82ff;
+    --outcome: #ff7a2e;
+    --outcome-fill: #ff7a2e;
+    --on-fill: #2b1405;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f0f0f;
+  --surface: #1b1b1b;
+  --raised: #242424;
+  --fg: #f7f7f5;
+  --fg-2: #8b8e90;
+  --fg-3: #5c5f61;
+  --line: #2e2e2e;
+  --line-strong: #3d3d3d;
+  --build: #3d82ff;
+  --outcome: #ff7a2e;
+  --outcome-fill: #ff7a2e;
+  --on-fill: #2b1405;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-raised: var(--raised);
+  --color-fg: var(--fg);
+  --color-fg2: var(--fg-2);
+  --color-fg3: var(--fg-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-build: var(--build);
+  --color-outcome: var(--outcome);
+  --color-outcome-fill: var(--outcome-fill);
+  --color-on-fill: var(--on-fill);
+  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+}
+
+html {
+  background: var(--bg);
+  color-scheme: light dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+  font-synthesis-weight: none;
+}
+
+::selection {
+  background: var(--outcome-fill);
+  color: var(--on-fill);
+}
+
+:focus-visible {
+  outline: 2px solid var(--build);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.wide {
+  font-stretch: 112%;
+  letter-spacing: -0.035em;
+}
+
+.narrow {
+  font-stretch: 86%;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+[data-density="pruned"] .prunable {
+  display: none;
+}
+
+.slab {
+  background: var(--surface);
+  border-radius: 28px;
+}
+
+@media (max-width: 640px) {
+  .slab {
+    border-radius: 18px;
+  }
+}
