@@ -3,12 +3,12 @@
 **Context pruning for LLM pipelines, driven by the eigenvalue spectrum of the
 embedding matrix rather than by a hand-tuned similarity threshold.**
 
-[![CI](https://github.com/dpatel78/entropy-prune/actions/workflows/ci.yml/badge.svg)](https://github.com/dpatel78/entropy-prune/actions/workflows/ci.yml)
+[![CI](https://github.com/dylanpatel78/entropy-prune/actions/workflows/ci.yml/badge.svg)](https://github.com/dylanpatel78/entropy-prune/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Ruff](https://img.shields.io/badge/lint-ruff-261230)](https://github.com/astral-sh/ruff)
 
-**[→ Live interactive demo](https://dpatel78.github.io/entropy-prune/)** — toggle
+**[→ Live interactive demo](https://dylanpatel78.github.io/entropy-prune/)** — toggle
 context chunks and watch the similarity matrix, eigenvalue spectrum, and effective
 rank respond in real time. Runs entirely in the browser; no backend.
 
@@ -63,7 +63,7 @@ SVD subspace stage consumes — the two halves of the library compute one object
 ## Install
 
 ```bash
-git clone https://github.com/dpatel78/entropy-prune.git
+git clone https://github.com/dylanpatel78/entropy-prune.git
 cd entropy-prune
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
@@ -132,7 +132,7 @@ claimed to work before it is checked off.
 | 6 | Evaluation harness (compression vs. task accuracy) | 📋 Planned |
 | 7 | Scale & packaging (blocked streaming, ANN, PyPI) | 📋 Planned |
 
-A prototype of modules 3 and 4 runs in the [live demo](https://dpatel78.github.io/entropy-prune/)
+A prototype of modules 3 and 4 runs in the [live demo](https://dylanpatel78.github.io/entropy-prune/)
 (greedy facility-location selection, entropy, Jacobi eigensolver — implemented in
 JavaScript against the real precomputed similarity matrix). Porting it to the
 Python core is module 4.
