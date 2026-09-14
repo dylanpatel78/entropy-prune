@@ -58,7 +58,7 @@ export function Work() {
               </Link>
             </div>
 
-            <dl className="flex gap-8 lg:col-span-3 lg:flex-col lg:gap-6">
+            <dl className="flex gap-8 lg:col-span-3 lg:flex-col lg:gap-7">
               {p.outcome.map((o) => (
                 <div key={o.label}>
                   <dt className="sr-only">{o.label}</dt>
@@ -69,7 +69,7 @@ export function Work() {
                     >
                       {o.value}
                     </span>
-                    <span className="mt-1.5 block max-w-[14ch] text-[13px] leading-snug text-fg3">
+                    <span className="mt-1.5 block max-w-[18ch] text-[13px] leading-snug text-fg3">
                       {o.label}
                     </span>
                   </dd>

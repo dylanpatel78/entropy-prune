@@ -42,13 +42,13 @@ export function Chrome() {
         <a
           href="#top"
           aria-label="Top of page"
-          className="grid size-11 shrink-0 place-items-center rounded-full bg-fg text-[13px] tracking-tight text-bg sm:size-13"
+          className="grid size-12 shrink-0 place-items-center rounded-full border border-line bg-surface/75 text-[14px] tracking-tight text-fg backdrop-blur-xl sm:size-14"
           style={{ fontStretch: "86%" }}
         >
           DP
         </a>
 
-        <nav className="hidden items-center gap-1 rounded-full border border-line bg-surface/70 px-2 py-1.5 backdrop-blur-xl sm:flex">
+        <nav className="hidden items-center gap-1 rounded-full border border-line bg-surface/75 p-1.5 backdrop-blur-xl lg:flex">
           {[
             ["Work", "#work"],
             ["Range", "#range"],
@@ -58,7 +58,7 @@ export function Chrome() {
             <a
               key={href}
               href={href}
-              className="rounded-full px-3.5 py-1.5 text-[14px] text-fg2 transition-colors hover:bg-raised hover:text-fg"
+              className="rounded-full px-5 py-2.5 text-[15px] text-fg2 transition-colors hover:bg-raised hover:text-fg"
             >
               {label}
             </a>
@@ -69,7 +69,7 @@ export function Chrome() {
           <button
             onClick={flipDensity}
             aria-pressed={density === "pruned"}
-            className="rounded-full border border-line bg-surface/70 px-3.5 py-2.5 text-[13px] text-fg2 backdrop-blur-xl transition-colors hover:text-fg"
+            className="hidden whitespace-nowrap rounded-full border border-line bg-surface/75 px-5 py-3.5 text-[14px] text-fg2 backdrop-blur-xl transition-colors hover:text-fg sm:block"
             title="Collapse the page to only what matters"
           >
             <span className="tnum">
@@ -80,7 +80,7 @@ export function Chrome() {
           <button
             onClick={flipTheme}
             aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
-            className="grid size-11 place-items-center rounded-full border border-line bg-surface/70 text-fg2 backdrop-blur-xl transition-colors hover:text-fg"
+            className="grid size-12 place-items-center rounded-full border border-line bg-surface/75 text-fg2 backdrop-blur-xl transition-colors hover:text-fg"
           >
             {theme === "dark" ? (
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden>
@@ -96,7 +96,8 @@ export function Chrome() {
 
           <a
             href="/resume"
-            className="rounded-full bg-fg px-5 py-2.5 text-[14px] text-bg transition-opacity hover:opacity-85 sm:px-6 sm:py-3"
+            className="whitespace-nowrap rounded-full px-6 py-3.5 text-[15px] transition-opacity hover:opacity-85 sm:px-8 sm:py-4"
+            style={{ background: "var(--outcome-fill)", color: "var(--on-fill)" }}
           >
             Resume
           </a>
