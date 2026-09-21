@@ -4,22 +4,47 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "entropy-prune"
-version = "0.1.0"
+version = "0.2.0"
 description = "High-efficiency LLM context pruning via Shannon entropy, SVD subspace decomposition, and cosine similarity scoring."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 license = { text = "MIT" }
-dependencies = [
-    "numpy>=1.26",
-    "torch>=2.2",
-    "sentence-transformers>=3.0",
+keywords = ["llm", "rag", "context-compression", "embeddings", "svd", "entropy"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
 ]
 
+# The core -- similarity, selection, evaluation -- is pure NumPy. The encoder
+# pulls ~2 GB of torch, so it lives behind an extra: bring your own vectors, or
+# install [embeddings] to get one.
+dependencies = ["numpy>=1.26"]
+
 [project.optional-dependencies]
-dev = ["pytest>=8.0", "ruff>=0.6"]
+embeddings = ["torch>=2.2", "sentence-transformers>=3.0"]
+eval = ["pyarrow>=15.0", "tiktoken>=0.7"]
+dev = ["pytest>=8.0", "ruff>=0.6", "build>=1.2", "twine>=5.0"]
+
+[project.urls]
+Homepage = "https://github.com/dylanpatel78/entropy-prune"
+Documentation = "https://dylanpatel78.github.io/entropy-prune/guide.html"
+Demo = "https://dylanpatel78.github.io/entropy-prune/"
+Issues = "https://github.com/dylanpatel78/entropy-prune/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+entropy_prune = ["py.typed"]
 
 [tool.ruff]
 line-length = 88
@@ -32,6 +57,8 @@ select = ["E", "F", "I", "N", "UP", "B", "ANN"]
 # Demo scripts favour linear-algebra naming (E, S, H, M) over PEP-8 lowercase,
 # and are read top-to-bottom rather than imported, so annotations add noise.
 "examples/*" = ["ANN", "N803", "N806"]
+# PEP 562 module __getattr__ is untyped by definition.
+"src/entropy_prune/__init__.py" = ["ANN401"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

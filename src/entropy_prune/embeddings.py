@@ -16,8 +16,9 @@ import numpy as np
 import torch
 from sentence_transformers import SentenceTransformer
 
+from entropy_prune.similarity import l2_normalize
+
 DEFAULT_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
-_NORM_EPSILON = 1e-12
 
 
 def resolve_device(preferred: str | None = None) -> str:
@@ -38,22 +39,6 @@ def resolve_device(preferred: str | None = None) -> str:
     if torch.backends.mps.is_available():
         return "mps"
     return "cpu"
-
-
-def l2_normalize(matrix: np.ndarray, epsilon: float = _NORM_EPSILON) -> np.ndarray:
-    """Scale every row of ``matrix`` to unit Euclidean length.
-
-    Args:
-        matrix: Array of shape ``(n, d)``.
-        epsilon: Floor added to each norm to make zero rows safe.
-
-    Returns:
-        Array of shape ``(n, d)`` and dtype ``float32`` with unit rows.
-    """
-    if matrix.ndim != 2:
-        raise ValueError(f"expected a 2-D matrix, got shape {matrix.shape}")
-    norms = np.linalg.norm(matrix, ord=2, axis=1, keepdims=True)
-    return (matrix / np.maximum(norms, epsilon)).astype(np.float32, copy=False)
 
 
 @dataclass(frozen=True, slots=True)

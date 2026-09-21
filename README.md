@@ -70,8 +70,13 @@ SVD subspace stage consumes — the two halves of the library compute one object
 git clone https://github.com/dylanpatel78/entropy-prune.git
 cd entropy-prune
 python3.12 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[embeddings,dev]"
 ```
+
+The core — similarity, selection, evaluation — is **pure NumPy**. The encoder
+pulls ~2 GB of torch, so it sits behind an extra: `pip install entropy-prune`
+lets you bring your own vectors, `[embeddings]` adds an encoder, `[eval]` adds
+the benchmark harness.
 
 > PyTorch has no Python 3.14 wheels yet, so the package pins `>=3.10,<3.14`.
 
@@ -120,6 +125,45 @@ assert np.allclose(lam, sv**2)        # [1.974 1.052 0.943 0.619 0.411]
 assert np.isclose(lam.sum(), len(chunks))
 ```
 
+## Results
+
+Evaluated on **HotpotQA** (distractor setting), which labels the exact sentences
+required to answer each question — so we can measure whether pruning keeps the
+information the task needs, using external ground truth rather than the
+objective the selector optimises. Baseline hyperparameters are tuned on a dev
+split; all figures are on **2,100 held-out questions**.
+
+**Support recall** — fraction of required sentences surviving:
+
+| Compression | random | top-k relevance | **MMR** |
+|---|---|---|---|
+| 30% | 0.697 | 0.932 | **0.936** |
+| 50% | 0.511 | 0.856 | **0.862** |
+| 70% | 0.311 | 0.747 | **0.749** |
+| 90% | 0.101 | 0.497 | **0.514** |
+
+At 50% compression the pipeline retains **86.2%** of required evidence against
+**51.1%** for random pruning (paired bootstrap, p < 1e-300).
+
+**Three honest caveats**, because the headline hides them:
+
+1. **MMR beats plain top-k relevance by only 0.2–1.7 points.** That gap reaches
+   significance on support recall only at 80–90% compression, and on the
+   stricter full-support metric it is not significant anywhere except marginally
+   at 90% (p=0.040, which fails correction for five comparisons).
+2. **Pure diversity does not work on a query-driven task.** Greedy facility
+   location — the coverage objective with no relevance term — scores 0.541 at
+   50% compression against random's 0.511. Nearly chance, because the most
+   *distinct* chunk is usually the most *irrelevant*.
+3. Support recall is a proxy. It measures whether the evidence survived, not
+   whether a model then answered correctly. End-to-end answer accuracy is not
+   yet measured.
+
+Cost: 0.18 ms pruning per document, 37.8 ms embedding (MiniLM-L6-v2 on MPS),
+~620 tokens saved per query at 50% compression.
+
+Full tables, significance tests and reproduction steps: [results/RESULTS.md](results/RESULTS.md).
+
 ## Status
 
 The library is being built module by module. **Modules 1 is complete and
@@ -131,10 +175,10 @@ claimed to work before it is checked off.
 | 1 | Embedding matrix + cosine similarity | ✅ Implemented, tested |
 | 2 | SVD subspace decomposition (Eckart–Young, randomized SVD) | 🔜 Next |
 | 3 | Shannon entropy & rank selection | 🔜 |
-| 4 | Pruning engine (greedy / submodular selection under a token budget) | 🔜 |
+| 4 | Pruning engine (greedy, MMR, threshold, random under a token budget) | ✅ Implemented, tested |
 | 5 | Chunking & input layer | 📋 Planned |
-| 6 | Evaluation harness (compression vs. task accuracy) | 📋 Planned |
-| 7 | Scale & packaging (blocked streaming, ANN, PyPI) | 📋 Planned |
+| 6 | Evaluation harness (HotpotQA support recall + paired tests) | ✅ Implemented, run |
+| 7 | Scale & packaging (blocked streaming, ANN, PyPI) | ⚠️ Packaged, not published |
 
 A prototype of modules 3 and 4 runs in the [live demo](https://dylanpatel78.github.io/entropy-prune/)
 (greedy facility-location selection, entropy, Jacobi eigensolver — implemented in

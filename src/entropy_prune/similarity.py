@@ -11,9 +11,24 @@ matrix whose eigendecomposition equals the squared singular spectrum of
 from __future__ import annotations
 
 import numpy as np
-import torch
 
-from entropy_prune.embeddings import l2_normalize
+_NORM_EPSILON = 1e-12
+
+
+def l2_normalize(matrix: np.ndarray, epsilon: float = _NORM_EPSILON) -> np.ndarray:
+    """Scale every row of ``matrix`` to unit Euclidean length.
+
+    Args:
+        matrix: Array of shape ``(n, d)``.
+        epsilon: Floor added to each norm to make zero rows safe.
+
+    Returns:
+        Array of shape ``(n, d)`` and dtype ``float32`` with unit rows.
+    """
+    if matrix.ndim != 2:
+        raise ValueError(f"expected a 2-D matrix, got shape {matrix.shape}")
+    norms = np.linalg.norm(matrix, ord=2, axis=1, keepdims=True)
+    return (matrix / np.maximum(norms, epsilon)).astype(np.float32, copy=False)
 
 
 def cosine_similarity_matrix(
@@ -39,6 +54,8 @@ def cosine_similarity_matrix(
     if device is None:
         gram = unit @ unit.T
     else:
+        import torch  # imported lazily: the core math never needs it
+
         tensor = torch.from_numpy(np.ascontiguousarray(unit)).to(device)
         gram = (tensor @ tensor.T).cpu().numpy()
 
