@@ -132,3 +132,66 @@ The coverage objective looks good when scored with a coverage-shaped metric and
 ordinary when scored with an independent one. That is a finding about
 evaluation methodology as much as about pruning, and it is the reason
 experiment 3 runs an actual model.
+
+---
+
+# Experiment 3: real SEC 10-K filings (FinanceBench)
+
+**Source.** [FinanceBench](https://huggingface.co/datasets/PatronusAI/financebench)
+(Patronus AI, CC-BY-4.0) pairs questions about real 10-K filings with a
+human-written gold answer and the exact filing page supporting it. 112 of its
+150 questions are 10-K based.
+
+**Construction.** FinanceBench's evidence pages average only ~350 words, too
+small to be a pruning problem. So a haystack is built the way HotpotQA's
+distractor setting is: the gold page(s) plus **18 distractor pages drawn from
+other companies' filings**, shuffled. Every sentence is real SEC text and every
+gold label is human-written — nothing is generated.
+
+Result: **78 questions over 30 companies, mean 12,125 tokens and 158 sentences
+per question, 4.1 gold sentences.** A realistic long-context pruning problem.
+
+| Compression | random | threshold | **top-k relevance** | greedy coverage | MMR |
+|---|---|---|---|---|---|
+| 50% | 0.5700 | 0.7491 | **0.8185** | 0.6611 | 0.8178 |
+| 70% | 0.3720 | 0.6491 | **0.7409** | 0.4603 | 0.6948 |
+| 80% | 0.2106 | 0.6153 | **0.6662** | 0.3931 | 0.6610 |
+| 90% | 0.1041 | 0.4906 | **0.5273** | 0.2613 | 0.5055 |
+
+**Top-k relevance wins at every compression level.** At 80% compression it
+retains **66.6%** of required evidence against **21.1%** for random — a 3.2x
+improvement, on 12k-token real filings.
+
+**Diversity loses badly again**, and by more than on HotpotQA: 0.3931 against
+top-k's 0.6662 at 80% compression, only modestly above random's 0.2106.
+
+## The finding across all three experiments
+
+| Corpus | Query? | Winner | Diversity's standing |
+|---|---|---|---|
+| HotpotQA | yes | relevance ≈ MMR | ≈ random (0.541 vs 0.511) |
+| Multi-News | no | lead-k on ROUGE; diversity on semantic coverage | wins only on a coverage-shaped metric |
+| FinanceBench 10-K | yes | relevance | well below relevance, above random |
+
+**Diversity-based selection — the coverage/entropy/SVD family this library was
+named for — does not beat relevance ranking on any query-driven task tested.**
+It wins only in the no-query setting, and only under a metric that shares its
+own mathematical form. Replicated across three corpora, two domains and two
+metric families.
+
+That is a negative result, and it is the honest headline of this project.
+
+## What a bank AI-risk evaluation would require
+
+The original goal was pruning 10-K context for **bank AI-risk questions**.
+FinanceBench cannot serve that: a keyword scan for "artificial intelligence",
+"machine learning", "model risk" and "cyber" matches **0 of its 150 rows** — it
+is financial-metrics QA (capex, margins, revenue), and its only financial-sector
+names are American Express, JPMorgan and PayPal.
+
+Real bank AI-risk disclosures are freely available from SEC EDGAR (Item 1A Risk
+Factors), and EDGAR is reachable. But **no public labelled benchmark of
+AI-risk questions over those filings exists**, so scored accuracy would require
+writing the questions and answers ourselves — which would be marking our own
+homework. That is documented here as a gap rather than filled with invented
+ground truth.
