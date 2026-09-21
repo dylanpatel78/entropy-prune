@@ -1,44 +1,30 @@
 import type { Metadata } from "next";
-import { Archivo, JetBrains_Mono } from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
-const archivo = Archivo({
+const outfit = Outfit({
   subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jetbrains",
+  weight: ["300", "400", "500"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: "Dylan Patel",
-  description: "Software and machine learning infrastructure.",
+  description: "Computer science and finance at the University of Maryland.",
 };
 
-const themeScript = `
-try {
-  var t = localStorage.getItem('theme');
-  if (t) document.documentElement.setAttribute('data-theme', t);
-} catch (e) {}
-`;
+const restoreTheme = `try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}`;
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: restoreTheme }} />
       </head>
-      <body className={`${archivo.variable} ${jetbrains.variable}`}>
-        {children}
-      </body>
+      <body className={`${outfit.variable} font-sans font-light`}>{children}</body>
     </html>
   );
 }

@@ -1,150 +1,108 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
+/* Dark is the default here, not a preference — the whole palette is built for it.
+   Light is opt-in through the toggle. */
 :root {
-  --bg: #e8e8e3;
-  --surface: #f7f7f4;
-  --raised: #ffffff;
-  --fg: #141414;
-  --fg-2: #6e7174;
-  --fg-3: #9a9da0;
-  --line: #dededa;
-  --line-strong: #c9c9c3;
-  --build: #0b54e8;
-  --outcome: #c4470a;
-  --outcome-fill: #ff7a2e;
-  --on-fill: #2b1405;
+  --ground: #08080a;
+  --surface: #141417;
+  --line: rgba(242, 236, 232, 0.12);
+  --ink: #f2ece8;
+  --ink2: #a7a29e;
+  --ink3: #76716e;
+  --acid: #e7fe55;
+
+  --card-heading: rgba(242, 236, 232, 0.95);
+  --card-body: rgba(242, 236, 232, 0.55);
+  --card-label: rgba(242, 236, 232, 0.32);
+  --card-border: rgba(242, 236, 232, 0.18);
+  --card-chip: rgba(242, 236, 232, 0.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0f0f0f;
-    --surface: #1b1b1b;
-    --raised: #242424;
-    --fg: #f7f7f5;
-    --fg-2: #8b8e90;
-    --fg-3: #5c5f61;
-    --line: #2e2e2e;
-    --line-strong: #3d3d3d;
-    --build: #3d82ff;
-    --outcome: #ff7a2e;
-    --outcome-fill: #ff7a2e;
-    --on-fill: #2b1405;
-  }
-}
+:root[data-theme="light"] {
+  --ground: #f0ebe6;
+  --surface: rgba(255, 255, 255, 0.7);
+  --line: rgba(0, 0, 0, 0.08);
+  --ink: #08080a;
+  --ink2: #5a5550;
+  --ink3: #8a837e;
 
-:root[data-theme="dark"] {
-  --bg: #0f0f0f;
-  --surface: #1b1b1b;
-  --raised: #242424;
-  --fg: #f7f7f5;
-  --fg-2: #8b8e90;
-  --fg-3: #5c5f61;
-  --line: #2e2e2e;
-  --line-strong: #3d3d3d;
-  --build: #3d82ff;
-  --outcome: #ff7a2e;
-  --outcome-fill: #ff7a2e;
-  --on-fill: #2b1405;
+  --card-heading: rgba(8, 8, 10, 0.88);
+  --card-body: rgba(8, 8, 10, 0.58);
+  --card-label: rgba(8, 8, 10, 0.38);
+  --card-border: rgba(8, 8, 10, 0.14);
+  --card-chip: rgba(8, 8, 10, 0.6);
 }
 
 @theme inline {
-  --color-bg: var(--bg);
+  --color-ground: var(--ground);
   --color-surface: var(--surface);
-  --color-raised: var(--raised);
-  --color-fg: var(--fg);
-  --color-fg2: var(--fg-2);
-  --color-fg3: var(--fg-3);
   --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-build: var(--build);
-  --color-outcome: var(--outcome);
-  --color-outcome-fill: var(--outcome-fill);
-  --color-on-fill: var(--on-fill);
-  --font-display: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --color-ink: var(--ink);
+  --color-ink2: var(--ink2);
+  --color-ink3: var(--ink3);
+  --color-acid: var(--acid);
+  --color-card-heading: var(--card-heading);
+  --color-card-body: var(--card-body);
+  --color-card-label: var(--card-label);
+  --color-card-border: var(--card-border);
+  --color-card-chip: var(--card-chip);
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
-  background: var(--bg);
-  color-scheme: light dark;
+  background: var(--ground);
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: var(--font-display);
+  background: var(--ground);
+  color: var(--ink);
+  margin: 0;
   -webkit-font-smoothing: antialiased;
-  font-synthesis-weight: none;
+  transition: background 0.3s;
 }
 
-::selection {
-  background: var(--outcome-fill);
-  color: var(--on-fill);
+/* Cards carry both gradients as custom properties so the theme swap is pure CSS. */
+.bento {
+  background: var(--bg-dark);
+  transition: background 0.4s ease;
+}
+
+:root[data-theme="light"] .bento {
+  background: var(--bg-light);
+}
+
+.label {
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  line-height: 1.5;
+}
+
+.figure {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.05em;
+  line-height: 1;
 }
 
 :focus-visible {
-  outline: 2px solid var(--build);
+  outline: 2px solid var(--acid);
   outline-offset: 3px;
-  border-radius: 2px;
-}
-
-.wide {
-  font-stretch: 112%;
-  letter-spacing: -0.035em;
-}
-
-.narrow {
-  font-stretch: 86%;
-}
-
-.tnum {
-  font-variant-numeric: tabular-nums;
+  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-[data-density="pruned"] .prunable {
-  display: none;
-}
-
-.slab {
-  background: var(--surface);
-  border-radius: 28px;
-}
-
-@media (max-width: 640px) {
-  .slab {
-    border-radius: 18px;
-  }
-}
-
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.panel-in {
-  animation: panel-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.panel-blue {
-  background: #1466ff;
-}
-
-.panel-invert {
-  background: var(--fg);
-  color: var(--bg);
+/* One shell for every page so the gutters can never drift apart. */
+.shell {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3.5vw, 48px);
 }

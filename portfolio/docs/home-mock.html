@@ -1,0 +1,108 @@
+<title>Dylan Patel Home</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500&display=swap">
+<style>
+:root{
+  --ground:#08080a; --card:#141417;
+  --line:rgba(242,236,232,.12); --line2:rgba(242,236,232,.2);
+  --ink:#f2ece8; --ink2:#a7a29e; --ink3:#76716e;
+  --acid:#e7fe55; --coal:#0d0d0f;
+  --r:26px; --pad:26px;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);margin:0;font-family:'Outfit',system-ui,sans-serif;font-weight:300;font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+h1,p{margin:0}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:18px;padding-block:0 80px}
+.k{font-size:10.5px;font-weight:500;letter-spacing:.17em;text-transform:uppercase;color:var(--ink3)}
+.grad .k{color:rgba(242,236,232,.66)}
+
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;padding-block:14px 10px;background:linear-gradient(var(--ground) 70%,transparent)}
+.navrow{display:flex;align-items:center;gap:10px}
+.pills{display:inline-flex;gap:3px;padding:5px;border:1px solid var(--line);border-radius:100px;background:rgba(20,20,23,.82);backdrop-filter:blur(20px)}
+.pills a{padding:8px 17px;border-radius:100px;font-size:13.5px;color:var(--ink2)}
+.pills a.on{background:var(--ink);color:var(--coal);font-weight:500}
+.dl{margin-left:auto;background:var(--acid);color:#14150b;border-radius:100px;padding:11px 22px;font-size:13.5px;font-weight:500}
+
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;padding-block:14px}
+.c{border-radius:var(--r);padding:var(--pad);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;gap:20px;background:var(--card)}
+.grad{color:var(--ink);background:
+  radial-gradient(130% 110% at 88% 98%, rgba(3,3,6,.52) 0%, transparent 62%),
+  linear-gradient(146deg,var(--c1) 0%,var(--c1) 11%,color-mix(in oklab,var(--c1) 52%,var(--c2)) 33%,var(--c2) 51%,var(--c2) 59%,color-mix(in oklab,var(--c2) 46%,var(--c3)) 79%,var(--c3) 95%,var(--c3) 100%)}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.arw{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;flex:none;border:1px solid currentColor;opacity:.4;font-size:13px}
+
+.s12{grid-column:span 12}
+
+.name{font-weight:300;font-size:clamp(48px,9vw,88px);line-height:.88;letter-spacing:-.05em}
+.tagl{margin-top:18px;font-size:clamp(16px,2vw,21px);color:var(--ink2);max-width:30ch;line-height:1.4}
+.tagl b{font-weight:400;color:var(--ink)}
+.umd{color:var(--ink);background:radial-gradient(64% 135% at 50% 135%,
+  #07060a 0%,
+  #0a0809 28%,
+  #140f0a 44%,
+  #2a1f0d 58%,
+  #4e3b11 70%,
+  #6f5516 82%,
+  #7c4418 92%,
+  #7d1020 98.2%,
+  #7d1020 100%)}
+.umd .k{color:rgba(255,255,255,.78)}
+.umd .degs{color:rgba(242,236,232,.7)}
+.umd .chip{border-color:rgba(242,236,232,.24);color:rgba(242,236,232,.86)}
+.umd .arw{color:rgba(255,255,255,.85);opacity:.5}
+.edu{flex-direction:row;align-items:stretch;gap:28px}
+.edu .body{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:space-between;gap:22px}
+.deg{font-size:clamp(20px,2.6vw,27px);font-weight:400;letter-spacing:-.025em;line-height:1.15}
+.degs{font-size:14px;color:rgba(242,236,232,.72);margin-top:4px}
+.degs .yr{font-variant-numeric:tabular-nums}
+.emblem{width:clamp(120px,16vw,200px);flex:none;align-self:flex-end;margin-bottom:-10px}
+@media(max-width:700px){.edu{flex-direction:column}.emblem{align-self:flex-start;width:96px}}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chip{border:1px solid rgba(242,236,232,.26);border-radius:100px;padding:6px 13px;font-size:12.5px;color:rgba(242,236,232,.86)}
+
+.flag{margin-top:34px;border:1px dashed var(--line2);border-radius:20px;padding:18px 20px;font-size:13px;color:var(--ink3);line-height:1.6}
+.flag b{color:var(--ink2);font-weight:400}
+:focus-visible{outline:2px solid var(--acid);outline-offset:3px;border-radius:6px}
+</style>
+
+<div class="wrap">
+
+<nav><div class="navrow">
+  <div class="pills"><a href="#" class="on">Home</a><a href="#">Projects</a><a href="#">About</a></div>
+  <a href="#" class="dl">Contact me</a>
+</div></nav>
+
+<div class="bento">
+
+  <div class="c s12" style="min-height:340px">
+    <div class="head"><p class="k">Lorem ipsum dolor</p><span class="arw">&#8599;</span></div>
+    <div>
+      <h1 class="name">Dylan Patel</h1>
+      <p class="tagl">Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod.</p>
+    </div>
+  </div>
+
+
+  <div class="c umd edu s12" style="min-height:430px">
+    <div class="body">
+      <div class="head"><p class="k">Education</p><span class="arw">&#8599;</span></div>
+      <div>
+        <p class="deg">BS Computer Science</p>
+        <p class="degs">University of Maryland &middot; College of Computer, Mathematical and Natural Sciences</p>
+        <p class="deg" style="margin-top:20px">Master of Finance</p>
+        <p class="degs">Robert H. Smith School of Business &middot; combined BS/MS</p>
+      </div>
+      <div class="chips">
+        <span class="chip">Algorithms</span><span class="chip">Machine Learning</span><span class="chip">Artificial Intelligence</span><span class="chip">HCI</span><span class="chip">Financial Markets</span>
+      </div>
+    </div>
+    <svg class="emblem" viewBox="0 0 100 100" role="img" aria-label="University of Maryland">
+      <path fill="rgba(255,255,255,.12)" d="M6 94V6h22l22 38L72 6h22v88H72V40L57 66H43L28 40v54z"></path>
+    </svg>
+  </div>
+
+</div>
+
+<div class="flag"><b>Education card.</b> Slim Maryland red edge on the left, top and right, falling through a deep gold to black pooled at the bottom centre. Text is back to warm white. The M is a block stand-in.</div>
+
+</div>

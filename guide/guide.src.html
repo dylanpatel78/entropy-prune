@@ -1818,39 +1818,84 @@ lambda ~ 0.7  ->  typical starting point. TUNE IT, do not inherit it.</div>
      a magic constant standing in for a measurement nobody made. Being able to draw
      that distinction is worth more than either number.</p>
 
-  <h3><span class="sn">Step 7</span>Greedy vs threshold, head to head</h3>
+  <h3><span class="sn">Step 7</span>Greedy vs threshold, honestly</h3>
+  <p>This is where I have to correct an earlier version of this guide, because the
+     mistake it made is the single most common way benchmark claims go wrong.</p>
+
   <div class="call ver">
-    <span class="hd">Verified &mdash; k=8, n=20, four thresholds tried</span>
+    <span class="hd">Verified &mdash; k=8, against an UNTUNED threshold</span>
     <div class="tw" style="margin:6px 0 0"><table>
       <thead><tr><th>Method</th><th>chunks kept</th><th class="n">coverage</th>
-        <th class="n">eff. rank</th></tr></thead>
+        <th class="n">eff. rank</th><th>topics hit</th></tr></thead>
       <tbody>
-        <tr><td><b>greedy coverage</b></td><td>[1, 6, 7, 10, 13, 17, 18, 19]</td>
-          <td class="n win">0.6401</td><td class="n win">7.776</td></tr>
-        <tr><td>threshold 0.40</td><td>[0, 3, 4, 5, 7, 8, 9, 11]</td>
-          <td class="n">0.5925</td><td class="n">7.010</td></tr>
-        <tr><td>threshold 0.50</td><td>[0, 2, 3, 4, 5, 7, 8, 9]</td>
-          <td class="n">0.5748</td><td class="n">6.845</td></tr>
-        <tr><td>threshold 0.60</td><td>[0, 1, 2, 3, 4, 5, 7, 8]</td>
-          <td class="n">0.5218</td><td class="n">6.332</td></tr>
-        <tr><td>threshold 0.70</td><td>[0, 1, 2, 3, 4, 5, 6, 7]</td>
-          <td class="n lose">0.5070</td><td class="n lose">6.091</td></tr>
+        <tr><td><b>greedy coverage</b></td><td>[1,6,7,10,13,17,18,19]</td>
+          <td class="n win">0.6401</td><td class="n win">7.776</td><td>5 of 5</td></tr>
+        <tr><td>threshold 0.40</td><td>[0,3,4,5,7,8,9,11]</td>
+          <td class="n">0.5925</td><td class="n">7.010</td><td>3 of 5</td></tr>
+        <tr><td>threshold 0.70</td><td>[0,1,2,3,4,5,6,7]</td>
+          <td class="n lose">0.5070</td><td class="n lose">6.091</td><td class="lose">2 of 5</td></tr>
       </tbody>
     </table></div>
   </div>
 
-  <p><b>Read the chunk lists, not just the scores.</b> Threshold 0.70 kept
-     <code>[0,1,2,3,4,5,6,7]</code> &mdash; the first eight chunks in index order.
-     It covered policy and earnings and <b>never reached risk, ML, or the unrelated
-     chunks at all</b>. Not because it judged them unimportant, but because it ran
-     out of budget before it got to them.</p>
-  <p>Threshold dedup is not a diversity algorithm. It is a <em>scan</em> that
-     rejects anything too close to what it has already taken, so <b>whatever comes
-     first wins</b> and whole regions of meaning-space are never visited. Greedy
-     beat it on both coverage and retained effective rank at every cutoff tested,
-     and it is not close.</p>
-  <p>The general principle: <b>a filter has no notion of what it has failed to
-     cover; an objective does.</b></p>
+  <p>Against threshold 0.70 greedy looks dominant: <b>+26.3% coverage</b>. The
+     threshold kept <code>[0..7]</code> &mdash; the first eight chunks in index
+     order &mdash; and never reached risk, ML or the unrelated chunks at all.</p>
+  <p><b>But 0.70 was never tuned.</b> It is a number that sounds reasonable. So
+     sweep the cutoff from 0.05 to 0.95, force it to fill the budget, and keep its
+     best:</p>
+
+  <div class="call ver">
+    <span class="hd">Verified &mdash; against a PROPERLY TUNED threshold</span>
+    <div class="tw" style="margin:6px 0 0"><table>
+      <thead><tr><th>Method</th><th>chunks kept</th><th class="n">coverage</th>
+        <th class="n">eff. rank</th><th>topics hit</th></tr></thead>
+      <tbody>
+        <tr><td><b>greedy coverage</b></td><td>[1,6,7,10,13,17,18,19]</td>
+          <td class="n">0.6401</td><td class="n">7.776</td><td>5 of 5</td></tr>
+        <tr><td><b>threshold 0.21</b> (best of 91)</td><td>[0,6,9,13,15,16,17,18]</td>
+          <td class="n">0.6231</td><td class="n">7.753</td><td>5 of 5</td></tr>
+      </tbody>
+    </table></div>
+    <div class="math">greedy advantage over the TUNED baseline:
+  coverage             +2.72%
+  retained eff. rank   +0.29%
+  topics covered        identical (5 of 5)
+
+swept across every budget k = 2..16:
+  mean coverage ratio    1.0127x     median 1.0175x
+  best case (k=6)        1.0438x
+  WORST case (k=2)       0.9057x     <- greedy LOSES here
+  greedy won on coverage at 14 of 15 budgets
+  retained eff. rank: mean 0.9925x  <- greedy is slightly WORSE on average</div>
+  </div>
+
+  <div class="call trap">
+    <span class="hd">Trap &mdash; this guide fell for it, so read this twice</span>
+    <p>The <b>+26.3%</b> figure is real arithmetic and a <b>worthless claim</b>. It
+       measures a tuned method against an untuned one. The honest number is
+       <b>+2.7%</b> on one 20-chunk corpus &mdash; and greedy actually
+       <em>loses</em> at k=2 and is marginally worse on retained effective
+       rank.</p>
+    <p>Module 6 warns: "the most common way to fake a win is to tune your method
+       carefully and compare against someone else's default." An earlier draft of
+       this very page did exactly that. <b>If you quote the 26% figure in an
+       interview and are asked "did you tune the baseline?", you have nothing.</b>
+       Quote +2.7% and the honest caveats instead &mdash; it is a weaker result and
+       a far stronger answer.</p>
+  </div>
+
+  <p><b>What survives, and it is not a performance number.</b> The mechanism
+     critique still stands on its own: threshold dedup is a sequential filter whose
+     output depends on <em>arrival order</em>, so its quality swings wildly with the
+     cutoff &mdash; 0.5070 at tau=0.70, 0.6231 at tau=0.21, a 23% spread driven
+     purely by a constant nobody can set a priori. Greedy needs no constant and
+     lands within 2% of the tuned optimum automatically.</p>
+  <p>That is the real argument: <b>not "greedy is much better" but "greedy is
+     tuning-free and about as good".</b> On a corpus with only 20.5% redundancy
+     there is very little headroom for <em>any</em> method &mdash; random pruning
+     is within 9% of greedy &mdash; so a large win was never available here, and
+     claiming one would be the tell that you had not checked.</p>
 
   <div class="call trap">
     <span class="hd">Trap &mdash; token budgets break the clean guarantee</span>
@@ -1928,6 +1973,11 @@ lambda ~ 0.7  ->  typical starting point. TUNE IT, do not inherit it.</div>
            chunk's marginal gain collapses and a risk chunk becomes the best pick.
            The trace shows it alternating earnings &rarr; risk &rarr; policy
            &rarr; earnings &rarr; method, landing in every cluster.</p>
+        <p><b>But be careful with the headline number.</b> That 0.640 vs 0.507
+           gap is against an <em>untuned</em> cutoff. Tune the threshold properly
+           (best is tau=0.21) and it reaches 0.6231 &mdash; greedy's real advantage
+           is <b>+2.7%</b>, and it loses outright at k=2. The durable claim is that
+           greedy is <b>tuning-free</b>, not that it is much better.</p>
         <p>The general lesson: <b>a filter has no notion of what it failed to cover;
            an objective does.</b></p>
       </div>
@@ -2444,6 +2494,10 @@ Report the KNEE, not a single operating point. A pruner is a CURVE, not a number
         negative eigenvalues from <code>eigvalsh</code></td></tr>
       <tr><td>Selection objective</td><td>facility location: every chunk you dropped
         should still be represented by one you kept</td></tr>
+      <tr><td>Greedy vs tuned threshold</td><td><b>+2.7%</b> coverage, not the +26%
+        you get against an untuned cutoff; the real win is needing no constant</td></tr>
+      <tr><td>Random baseline</td><td>within 9% of greedy on this corpus &mdash; low
+        redundancy means little headroom for any method</td></tr>
       <tr><td>Submodularity</td><td>diminishing returns;
         <code>f(P+x)&minus;f(P) &ge; f(Q+x)&minus;f(Q)</code> for
         <code>P&sube;Q</code></td></tr>

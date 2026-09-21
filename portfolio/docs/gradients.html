@@ -1,0 +1,224 @@
+<title>Fishbowl Gradients</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap">
+<style>
+:root{
+  --ground:#060608; --ink:#f2ece8; --ink2:#a29d99; --ink3:#6f6a67;
+  --line:rgba(242,236,232,.12);
+}
+*{box-sizing:border-box}
+body{
+  background:var(--ground); color:var(--ink); margin:0;
+  font-family:'Outfit',system-ui,-apple-system,sans-serif;
+  font-weight:300; font-size:16px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:22px;padding-block:0 100px}
+h1,h2,p{margin:0}
+header{padding-block:72px 40px}
+h1{font-weight:300;font-size:clamp(44px,9vw,86px);line-height:.94;letter-spacing:-.045em}
+.deck{margin-top:22px;color:var(--ink2);font-size:clamp(16px,2vw,19px);max-width:58ch}
+.lab{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ink3)}
+
+.grid{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));padding-block:22px}
+figure{margin:0;display:flex;flex-direction:column;gap:14px}
+.card{
+  border-radius:30px;
+  aspect-ratio:16/9;
+  width:100%;
+  background:
+    radial-gradient(130% 110% at 88% 98%, rgba(3,3,6,.52) 0%, transparent 62%),
+    linear-gradient(146deg,
+      var(--c1) 0%,
+      var(--c1) 11%,
+      color-mix(in oklab, var(--c1) 52%, var(--c2)) 33%,
+      var(--c2) 51%,
+      var(--c2) 59%,
+      color-mix(in oklab, var(--c2) 46%, var(--c3)) 79%,
+      var(--c3) 95%,
+      var(--c3) 100%);
+}
+figcaption{display:flex;flex-direction:column;gap:7px}
+.nm{font-size:17px;font-weight:400;letter-spacing:-.01em}
+.hx{display:flex;flex-wrap:wrap;gap:6px 14px}
+.hx span{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:400;color:var(--ink3);font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.hx i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.use{font-size:12.5px;color:var(--ink3);font-weight:300}
+
+section{padding-block:46px;border-top:1px solid var(--line);margin-top:40px}
+section#more{padding-block:40px 0;margin-top:46px}
+.shead{margin-bottom:0}
+.note{color:var(--ink2);font-size:15px;max-width:68ch;font-weight:300}
+.note + .note{margin-top:14px}
+.scroll{overflow-x:auto;margin-top:22px}
+pre{margin:0;padding:20px 22px;border:1px solid var(--line);border-radius:20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.8;color:var(--ink2);white-space:pre}
+.hl{color:var(--ink)}
+</style>
+
+<div class="wrap">
+
+<header>
+  <p class="lab">Card colour &middot; fishbowl treatment</p>
+  <h1>Fourteen.</h1>
+  <p class="deck">Your six at the top, eight more below. Each hue holds a band before it transitions, so the three zones stay distinguishable rather than dissolving into one another.</p>
+</header>
+
+<div class="grid">
+
+  <figure>
+    <div class="card" style="--c1:#c8783c;--c2:#8a4270;--c3:#2c1a58"></div>
+    <figcaption>
+      <p class="nm">Dusk</p>
+      <p class="hx"><span><i style="background:#c8783c"></i>#C8783C</span><span><i style="background:#8a4270"></i>#8A4270</span><span><i style="background:#2c1a58"></i>#2C1A58</span></p>
+      <p class="use">Amber &rarr; rose &rarr; violet</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#be8440;--c2:#98422e;--c3:#3a1524"></div>
+    <figcaption>
+      <p class="nm">Ember</p>
+      <p class="hx"><span><i style="background:#be8440"></i>#BE8440</span><span><i style="background:#98422e"></i>#98422E</span><span><i style="background:#3a1524"></i>#3A1524</span></p>
+      <p class="use">Gold &rarr; rust &rarr; plum</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#cc8460;--c2:#a8462c;--c3:#42111e"></div>
+    <figcaption>
+      <p class="nm">Coral</p>
+      <p class="hx"><span><i style="background:#cc8460"></i>#CC8460</span><span><i style="background:#a8462c"></i>#A8462C</span><span><i style="background:#42111e"></i>#42111E</span></p>
+      <p class="use">Peach &rarr; coral &rarr; wine</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#c44e7c;--c2:#852e6c;--c3:#301346"></div>
+    <figcaption>
+      <p class="nm">Bloom</p>
+      <p class="hx"><span><i style="background:#c44e7c"></i>#C44E7C</span><span><i style="background:#852e6c"></i>#852E6C</span><span><i style="background:#301346"></i>#301346</span></p>
+      <p class="use">Pink &rarr; magenta &rarr; purple</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#9474c4;--c2:#54389e;--c3:#181240"></div>
+    <figcaption>
+      <p class="nm">Iris</p>
+      <p class="hx"><span><i style="background:#9474c4"></i>#9474C4</span><span><i style="background:#54389e"></i>#54389E</span><span><i style="background:#181240"></i>#181240</span></p>
+      <p class="use">Lilac &rarr; violet &rarr; indigo</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#6a82aa;--c2:#384664;--c3:#121622"></div>
+    <figcaption>
+      <p class="nm">Slate</p>
+      <p class="hx"><span><i style="background:#6a82aa"></i>#6A82AA</span><span><i style="background:#384664"></i>#384664</span><span><i style="background:#121622"></i>#121622</span></p>
+      <p class="use">Pale blue &rarr; slate &rarr; charcoal</p>
+    </figcaption>
+  </figure>
+
+</div>
+
+<section id="more">
+  <div class="shead"><h2 class="lab">More to consider</h2></div>
+  <p class="note" style="margin:16px 0 4px">Eight further triads on the same recipe, filling the parts of the wheel your six leave empty — earth, olive, green, teal, blue, red, and one neutral.</p>
+</section>
+
+<div class="grid">
+
+  <figure>
+    <div class="card" style="--c1:#b8926a;--c2:#7e5230;--c3:#2a1810"></div>
+    <figcaption>
+      <p class="nm">Umber</p>
+      <p class="hx"><span><i style="background:#b8926a"></i>#B8926A</span><span><i style="background:#7e5230"></i>#7E5230</span><span><i style="background:#2a1810"></i>#2A1810</span></p>
+      <p class="use">Sand &rarr; bronze &rarr; espresso</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#c0a850;--c2:#786e2e;--c3:#262a12"></div>
+    <figcaption>
+      <p class="nm">Brass</p>
+      <p class="hx"><span><i style="background:#c0a850"></i>#C0A850</span><span><i style="background:#786e2e"></i>#786E2E</span><span><i style="background:#262a12"></i>#262A12</span></p>
+      <p class="use">Gold &rarr; olive &rarr; moss</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#84ae6e;--c2:#3e7a4c;--c3:#12301e"></div>
+    <figcaption>
+      <p class="nm">Fern</p>
+      <p class="hx"><span><i style="background:#84ae6e"></i>#84AE6E</span><span><i style="background:#3e7a4c"></i>#3E7A4C</span><span><i style="background:#12301e"></i>#12301E</span></p>
+      <p class="use">Light green &rarr; green &rarr; pine</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#98b69c;--c2:#4a7c72;--c3:#163030"></div>
+    <figcaption>
+      <p class="nm">Sage</p>
+      <p class="hx"><span><i style="background:#98b69c"></i>#98B69C</span><span><i style="background:#4a7c72"></i>#4A7C72</span><span><i style="background:#163030"></i>#163030</span></p>
+      <p class="use">Pale sage &rarr; sea green &rarr; deep teal</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#66b6ae;--c2:#2c7084;--c3:#0e2438"></div>
+    <figcaption>
+      <p class="nm">Lagoon</p>
+      <p class="hx"><span><i style="background:#66b6ae"></i>#66B6AE</span><span><i style="background:#2c7084"></i>#2C7084</span><span><i style="background:#0e2438"></i>#0E2438</span></p>
+      <p class="use">Aqua &rarr; teal &rarr; midnight</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#6c9ad2;--c2:#32529c;--c3:#101836"></div>
+    <figcaption>
+      <p class="nm">Cobalt</p>
+      <p class="hx"><span><i style="background:#6c9ad2"></i>#6C9AD2</span><span><i style="background:#32529c"></i>#32529C</span><span><i style="background:#101836"></i>#101836</span></p>
+      <p class="use">Sky &rarr; cobalt &rarr; navy</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#c26e7c;--c2:#92303e;--c3:#360e18"></div>
+    <figcaption>
+      <p class="nm">Garnet</p>
+      <p class="hx"><span><i style="background:#c26e7c"></i>#C26E7C</span><span><i style="background:#92303e"></i>#92303E</span><span><i style="background:#360e18"></i>#360E18</span></p>
+      <p class="use">Rose &rarr; crimson &rarr; oxblood</p>
+    </figcaption>
+  </figure>
+
+  <figure>
+    <div class="card" style="--c1:#98989e;--c2:#4c4c54;--c3:#131316"></div>
+    <figcaption>
+      <p class="nm">Graphite</p>
+      <p class="hx"><span><i style="background:#98989e"></i>#98989E</span><span><i style="background:#4c4c54"></i>#4C4C54</span><span><i style="background:#131316"></i>#131316</span></p>
+      <p class="use">Light grey &rarr; slate &rarr; near black</p>
+    </figcaption>
+  </figure>
+
+</div>
+
+<section>
+  <h2 class="lab">The recipe</h2>
+  <p class="note" style="margin-top:16px">Eight stops instead of five. The duplicated stops are what create the territory — each hue sits flat for a band before the mix begins, so you read three zones rather than one continuous wash.</p>
+  <div class="scroll">
+<pre>background:
+  radial-gradient(130% 110% at 88% 98%, rgba(3,3,6,.52), transparent 62%),
+  linear-gradient(146deg,
+    var(--c1)                                       0%,
+    <span class="hl">var(--c1)                                      11%,</span>
+    color-mix(in oklab, var(--c1) 52%, var(--c2))   33%,
+    var(--c2)                                      51%,
+    <span class="hl">var(--c2)                                      59%,</span>
+    color-mix(in oklab, var(--c2) 46%, var(--c3))   79%,
+    var(--c3)                                      95%,
+    var(--c3)                                     100%);</pre>
+  </div>
+  <p class="note" style="margin-top:22px">The radial on top shades the bottom-right corner, which deepens the card without dulling the hues — darkening the hexes alone flattens them.</p>
+  <p class="note">Mixes are still computed in oklab. sRGB loses lightness through the middle of a blend and that dip is what read as a grey band.</p>
+</section>
+
+</div>

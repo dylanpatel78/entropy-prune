@@ -1,61 +1,130 @@
-import Link from "next/link";
-import { Chrome } from "@/components/chrome";
-import { profile } from "@/content/profile";
-import { projects } from "@/content/projects";
+import { Nav } from "@/components/nav";
+import { Section, Entry, Chips } from "@/components/resume";
+
+const L1 =
+  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+const L2 =
+  "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+
+const NAV = [
+  ["Experience", "experience"],
+  ["Leadership", "leadership"],
+  ["Education", "education"],
+  ["Skills", "skills"],
+] as const;
 
 export default function Resume() {
   return (
     <>
-      <Chrome />
-      <main className="px-3 pb-3 sm:px-6 sm:pb-6">
-        <div className="slab mx-auto max-w-[1440px]">
-          <div className="px-5 pt-32 pb-20 sm:px-10 sm:pt-44 sm:pb-28">
-            <h1 className="wide text-[clamp(2.6rem,8vw,6rem)] leading-[0.95]">
-              {profile.name}
-            </h1>
-            <p className="mt-6 max-w-[48ch] text-[clamp(1.05rem,1.8vw,1.4rem)] leading-relaxed text-fg2">
-              {profile.standfirst}
-            </p>
+      <Nav />
+      <main className="shell pb-28">
+        <header className="max-w-[54ch] pt-4 pb-14">
+          <h1 className="text-[clamp(46px,7vw,88px)] font-light leading-[0.92] tracking-[-0.05em] text-ink">
+            Resume.
+          </h1>
+          <p className="mt-7 text-[clamp(16px,1.8vw,19px)] leading-[1.65] text-ink2">
+            {L1} {L2}
+          </p>
+          <a
+            href="#"
+            className="mt-9 inline-block rounded-full px-7 py-3 text-[13.5px] font-medium"
+            style={{ background: "var(--acid)", color: "#08080a" }}
+          >
+            Download PDF
+          </a>
+        </header>
 
-            <section className="mt-16 border-t border-line pt-10">
-              <h2 className="mb-8 text-[15px] text-fg3">Selected work</h2>
-              <ul className="space-y-8">
-                {projects.map((p) => (
-                  <li key={p.slug} className="grid gap-3 sm:grid-cols-12">
-                    <div className="sm:col-span-3">
-                      <Link
-                        href={`/work/${p.slug}`}
-                        className="text-[17px] underline decoration-from-font underline-offset-[5px]"
-                      >
-                        {p.name}
-                      </Link>
-                      <p className="mt-1 text-[13px] text-fg3">{p.period}</p>
-                    </div>
-                    <p className="max-w-[56ch] text-[15px] leading-relaxed text-fg2 sm:col-span-9">
-                      {p.summary}{" "}
-                      <span style={{ color: "var(--outcome)" }}>
-                        {p.outcome.map((o) => `${o.value} ${o.label}`).join(" · ")}
-                      </span>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
+        <div className="grid gap-x-16 gap-y-10 lg:grid-cols-[170px_minmax(0,1fr)]">
+          <nav className="hidden lg:block">
+            <ul className="sticky top-8 flex flex-col gap-3 border-l border-line pl-5">
+              {NAV.map(([label, id]) => (
+                <li key={id}>
+                  <a href={`#${id}`} className="text-[14px] text-ink2 transition-colors hover:text-ink">
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
 
-            <section className="mt-16 border-t border-line pt-10">
-              <h2 className="mb-8 text-[15px] text-fg3">Leadership</h2>
-              <p className="text-[17px]">{profile.leadership.what}</p>
-              <p className="mt-1 text-[13px] text-fg3">
-                {profile.leadership.period}
-              </p>
-              <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-fg2">
-                {profile.leadership.body}
-              </p>
-            </section>
+          <div>
+            <Section id="experience" title="Experience" count="04">
+              <Entry
+                role="Technical Product Intern"
+                org="Pinnacle Infotech · Sugar Land, TX"
+                when="Jun — Jul 2026"
+                bullets={[L1, L2]}
+              />
+              <Entry
+                role="Co-author, HCI technical contributor"
+                org="Embodied Dynamics Lab, University of Maryland"
+                when="May 2026 —"
+                bullets={[L2, L1]}
+              />
+              <Entry
+                role="Undergraduate teaching assistant"
+                org="Department of Computer Science, University of Maryland"
+                when="Feb 2026 —"
+                bullets={[L1]}
+              />
+              <Entry
+                role="Student manager"
+                org="Student Organization Resource Center, University of Maryland"
+                when="Jan 2025 —"
+                bullets={[L2, L1]}
+              />
+            </Section>
 
-            <p className="mt-16 border-t border-line pt-10 text-[14px] text-fg3">
-              A downloadable PDF goes here once you have one.
-            </p>
+            <Section id="leadership" title="Leadership" count="03">
+              <Entry
+                role="Vice president and treasurer"
+                org="Product Space @ UMD"
+                when="Aug 2025 —"
+                bullets={[L1, L2]}
+              />
+              <Entry
+                role="Student senator"
+                org="University Senate, Student Affairs Committee"
+                when="May 2025 —"
+                bullets={[L2]}
+              />
+              <Entry
+                role="Council member"
+                org="CMNS Dean’s Student Advisory Council"
+                when="Jan 2026 —"
+                bullets={[L1]}
+              />
+            </Section>
+
+            <Section id="education" title="Education" count="02">
+              <Entry
+                role="BS, Computer Science"
+                org="University of Maryland · College of Computer, Mathematical and Natural Sciences"
+                when="College Park, MD"
+                bullets={[L1]}
+              />
+              <Entry
+                role="Master of Finance"
+                org="Robert H. Smith School of Business · combined BS/MS"
+                when="College Park, MD"
+                bullets={[L2]}
+              />
+            </Section>
+
+            <Section id="skills" title="Skills" count="03">
+              <Chips
+                label="Engineering"
+                items={["React.js", "Flask", "Node.js", "TensorFlow", "Gemini APIs", "AWS", "Azure", "GitHub", "Agile / Scrum"]}
+              />
+              <Chips
+                label="Research and data"
+                items={["Python", "Pandas", "NumPy", "SQL", "Power BI", "Qualtrics", "Predictive modelling"]}
+              />
+              <Chips
+                label="Programme management"
+                items={["Program evaluation", "Survey design", "Assessment", "Workshop facilitation", "Smartsheet", "TerpLink"]}
+              />
+            </Section>
           </div>
         </div>
       </main>
