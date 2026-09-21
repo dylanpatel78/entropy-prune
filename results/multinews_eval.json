@@ -1,0 +1,130 @@
+{
+  "0.5": {
+    "random": {
+      "rouge1_recall": 0.5834990432644288,
+      "rouge2_recall": 0.2515370698319205,
+      "semantic_coverage": 0.6129290646314621
+    },
+    "lead_k": {
+      "rouge1_recall": 0.5891618364007774,
+      "rouge2_recall": 0.2676316963223335,
+      "semantic_coverage": 0.6131557188555599
+    },
+    "centroid_relevance": {
+      "rouge1_recall": 0.5772062494301072,
+      "rouge2_recall": 0.265587089233037,
+      "semantic_coverage": 0.603507082760334
+    },
+    "threshold": {
+      "rouge1_recall": 0.591425417993344,
+      "rouge2_recall": 0.2725868912187671,
+      "semantic_coverage": 0.6114127761498094
+    },
+    "greedy_coverage": {
+      "rouge1_recall": 0.5889455385154299,
+      "rouge2_recall": 0.25133074885602347,
+      "semantic_coverage": 0.6286107494682074
+    },
+    "mmr": {
+      "rouge1_recall": 0.5953274582241903,
+      "rouge2_recall": 0.26685359036902634,
+      "semantic_coverage": 0.616865596845746
+    }
+  },
+  "0.7": {
+    "random": {
+      "rouge1_recall": 0.47088063399958585,
+      "rouge2_recall": 0.17616438864122885,
+      "semantic_coverage": 0.5692376501113177
+    },
+    "lead_k": {
+      "rouge1_recall": 0.4853381278079615,
+      "rouge2_recall": 0.1962929731837683,
+      "semantic_coverage": 0.5729613693803549
+    },
+    "centroid_relevance": {
+      "rouge1_recall": 0.4702880484218103,
+      "rouge2_recall": 0.19214003215292597,
+      "semantic_coverage": 0.5662503363937139
+    },
+    "threshold": {
+      "rouge1_recall": 0.48260907157417954,
+      "rouge2_recall": 0.19635792164535093,
+      "semantic_coverage": 0.5721369786560535
+    },
+    "greedy_coverage": {
+      "rouge1_recall": 0.4726347071192899,
+      "rouge2_recall": 0.16938153654804075,
+      "semantic_coverage": 0.5914524887502194
+    },
+    "mmr": {
+      "rouge1_recall": 0.48728046260708735,
+      "rouge2_recall": 0.18992151191485007,
+      "semantic_coverage": 0.5773860490322114
+    }
+  },
+  "0.8": {
+    "random": {
+      "rouge1_recall": 0.387328127625114,
+      "rouge2_recall": 0.12877950990183792,
+      "semantic_coverage": 0.5337199907004834
+    },
+    "lead_k": {
+      "rouge1_recall": 0.4073919578789705,
+      "rouge2_recall": 0.15331085124347338,
+      "semantic_coverage": 0.5450514754652978
+    },
+    "centroid_relevance": {
+      "rouge1_recall": 0.3882430414616838,
+      "rouge2_recall": 0.14402712500236559,
+      "semantic_coverage": 0.5404660257697106
+    },
+    "threshold": {
+      "rouge1_recall": 0.3987715947736942,
+      "rouge2_recall": 0.14689821309313678,
+      "semantic_coverage": 0.5446088828146458
+    },
+    "greedy_coverage": {
+      "rouge1_recall": 0.391767787848307,
+      "rouge2_recall": 0.12369963742609072,
+      "semantic_coverage": 0.5654298970103264
+    },
+    "mmr": {
+      "rouge1_recall": 0.4056700946312416,
+      "rouge2_recall": 0.1415218593073728,
+      "semantic_coverage": 0.5522681277245283
+    }
+  },
+  "0.9": {
+    "random": {
+      "rouge1_recall": 0.26059862960129565,
+      "rouge2_recall": 0.06884443106750936,
+      "semantic_coverage": 0.46731046482920646
+    },
+    "lead_k": {
+      "rouge1_recall": 0.2816596356153369,
+      "rouge2_recall": 0.08963638673860799,
+      "semantic_coverage": 0.48633440911769865
+    },
+    "centroid_relevance": {
+      "rouge1_recall": 0.2701070863338622,
+      "rouge2_recall": 0.08311762758047506,
+      "semantic_coverage": 0.5008790421485901
+    },
+    "threshold": {
+      "rouge1_recall": 0.2772727249076113,
+      "rouge2_recall": 0.0857863016347926,
+      "semantic_coverage": 0.5050767945498228
+    },
+    "greedy_coverage": {
+      "rouge1_recall": 0.2695607800193406,
+      "rouge2_recall": 0.07024365435138151,
+      "semantic_coverage": 0.5218906929343938
+    },
+    "mmr": {
+      "rouge1_recall": 0.282221295043556,
+      "rouge2_recall": 0.08116423617660072,
+      "semantic_coverage": 0.507524829506874
+    }
+  }
+}

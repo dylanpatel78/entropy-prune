@@ -80,3 +80,55 @@ cd scripts && PYTHONPATH=. python significance.py --parquet <same> --questions 3
 
 Data: `distractor/validation-00000-of-00001.parquet` from the
 `hotpotqa/hotpot_qa` dataset on Hugging Face.
+
+---
+
+# Experiment 2: does diversity win when the task is coverage?
+
+HotpotQA showed diversity failing because there is a query and the most
+*distinct* chunk is usually the most *irrelevant*. Multi-News is the opposite
+condition — several articles about one event, **no query**, and the goal is to
+cover everything the reference summary mentions. If diversity wins here, the
+finding becomes "diversity helps coverage tasks, relevance helps lookup tasks."
+
+**Setup:** 400 Multi-News test articles, mean 67.3 sentences / 1,923 tokens.
+Ground truth is the human reference summary, which no selector sees. Two metric
+families: ROUGE-1/2 recall (lexical n-gram overlap) and semantic coverage (mean
+best-match of each reference-summary sentence to a surviving chunk).
+
+`lead_k` — literally "keep the first sentences" — is included because it is the
+classic strong summarization baseline and news follows the inverted pyramid.
+
+| Compression | metric | random | lead-k | centroid | threshold | **greedy cov.** | MMR |
+|---|---|---|---|---|---|---|---|
+| 50% | ROUGE-1 rec | 0.5835 | 0.5892 | 0.5772 | 0.5914 | 0.5889 | **0.5953** |
+| 50% | semantic cov | 0.6129 | 0.6132 | 0.6035 | 0.6114 | **0.6286** | 0.6169 |
+| 70% | ROUGE-1 rec | 0.4709 | **0.4853** | 0.4703 | 0.4826 | 0.4726 | 0.4873 |
+| 70% | semantic cov | 0.5692 | 0.5730 | 0.5663 | 0.5721 | **0.5915** | 0.5774 |
+| 80% | ROUGE-1 rec | 0.3873 | **0.4074** | 0.3882 | 0.3988 | 0.3918 | 0.4057 |
+| 80% | semantic cov | 0.5337 | 0.5451 | 0.5405 | 0.5446 | **0.5654** | 0.5523 |
+| 90% | ROUGE-1 rec | 0.2606 | **0.2817** | 0.2701 | 0.2773 | 0.2696 | 0.2822 |
+| 90% | semantic cov | 0.4673 | 0.4863 | 0.5009 | 0.5051 | **0.5219** | 0.5075 |
+
+## The result splits by metric, and that is the finding
+
+**On semantic coverage, greedy facility location wins at every compression
+level** — by 1.9% to 3.3% over the next best method. The hypothesis looks
+confirmed.
+
+**On ROUGE recall it does not win at all.** It ties with random and loses to
+`lead_k` at 70/80/90% compression. Taking the first sentences of each article
+beats the diversity objective on lexical overlap.
+
+**Why the split matters more than either number.** Semantic coverage is a
+max-cosine coverage metric, and greedy facility location *optimises* a
+max-cosine coverage objective. Different target set — the reference summary
+rather than the source — so it is not circular, but the metric shares the
+method's functional form, which biases toward it. ROUGE shares no such form,
+and there the advantage vanishes.
+
+**Honest conclusion: "diversity helps summarization" is not cleanly supported.**
+The coverage objective looks good when scored with a coverage-shaped metric and
+ordinary when scored with an independent one. That is a finding about
+evaluation methodology as much as about pruning, and it is the reason
+experiment 3 runs an actual model.
