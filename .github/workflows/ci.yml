@@ -32,13 +32,13 @@ jobs:
         run: pip install torch --index-url https://download.pytorch.org/whl/cpu
 
       - name: Install package
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[embeddings,eval,dev]"
 
       - name: Lint
-        run: ruff check src tests examples
+        run: ruff check src tests examples scripts
 
       - name: Format check
-        run: ruff format --check src tests examples
+        run: ruff format --check src tests examples scripts
 
       - name: Test
         run: pytest -q
