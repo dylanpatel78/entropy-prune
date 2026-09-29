@@ -162,6 +162,46 @@ At 50% compression the pipeline retains **86.2%** of required evidence against
 Cost: 0.18 ms pruning per document, 37.8 ms embedding (MiniLM-L6-v2 on MPS),
 ~620 tokens saved per query at 50% compression.
 
+### Real SEC 10-K filings
+
+Same evaluation on [FinanceBench](https://huggingface.co/datasets/PatronusAI/financebench)
+— real 10-K questions with human-written answers and labelled evidence pages,
+padded with 18 distractor pages from other filings. 78 questions, 30 companies,
+**mean 12,125 tokens each**.
+
+| Compression | random | **top-k relevance** | greedy coverage |
+|---|---|---|---|
+| 50% | 0.570 | **0.819** | 0.661 |
+| 80% | 0.211 | **0.666** | 0.393 |
+
+At 80% compression: **66.6% of required evidence retained vs 21.1% for random** —
+a 3.2× improvement on 12k-token filings.
+
+### End-to-end answer accuracy
+
+Running a local reader (Qwen2.5-0.5B) over pruned vs full context on 150
+questions: pruning to 20% of tokens scored **F1 0.319 against full context's
+0.292**, while random pruning to the same budget scored 0.255.
+
+**But none of those gaps are statistically significant** (paired bootstrap,
+pruned vs full p=0.373; pruned vs random p=0.065). At n=150 a 3-point F1 gap is
+inside the noise. The defensible claim is *no measurable quality loss at 80%
+token reduction*, not a gain.
+
+### The negative result
+
+Across four experiments, **the diversity/entropy/SVD family this library is
+named for does not beat relevance ranking on any query-driven task tested**:
+
+| Corpus | Query? | Winner | Diversity's standing |
+|---|---|---|---|
+| HotpotQA | yes | relevance ≈ MMR | ≈ random (0.541 vs 0.511) |
+| Multi-News | no | lead-k on ROUGE | wins only on a coverage-shaped metric |
+| SEC 10-K | yes | relevance | far below (0.393 vs 0.666) |
+
+It wins only in the no-query setting, and only under a metric sharing its own
+mathematical form. That is the honest headline of this project.
+
 Full tables, significance tests and reproduction steps: [results/RESULTS.md](results/RESULTS.md).
 
 ## Status

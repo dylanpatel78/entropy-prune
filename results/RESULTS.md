@@ -195,3 +195,67 @@ AI-risk questions over those filings exists**, so scored accuracy would require
 writing the questions and answers ourselves — which would be marking our own
 homework. That is documented here as a gap rather than filled with invented
 ground truth.
+
+---
+
+# Experiment 4: end-to-end answer accuracy
+
+Support recall says the evidence survived. It does not say the model used it.
+This runs a local reader (Qwen2.5-0.5B-Instruct, 494M params) over pruned and
+full context on 150 HotpotQA questions and scores answers by exact match and
+token F1 — the cost-versus-quality curve.
+
+| Condition | tokens | saved | EM | F1 | F1 vs full |
+|---|---|---|---|---|---|
+| full context | 1,239 | 0% | 0.1733 | 0.2919 | 100.0% |
+| 50% top-k relevance | 616 | 50% | 0.2133 | 0.3224 | **110.4%** |
+| 70% top-k relevance | 368 | 70% | 0.2133 | 0.3218 | **110.2%** |
+| 80% top-k relevance | 244 | 80% | 0.2067 | 0.3193 | **109.4%** |
+| 90% top-k relevance | 120 | 90% | 0.1733 | 0.2648 | 90.7% |
+| 50% random | 615 | 50% | 0.1467 | 0.2504 | 85.8% |
+| 80% random | 244 | 80% | 0.1533 | 0.2548 | 87.3% |
+
+The apparent headline is that **pruning to 20% of tokens beats the full
+context**, and that random pruning to the same budget does not — so the effect
+would be about removing the *right* text, not merely less text. The plausible
+mechanism is distractor interference: HotpotQA's distractor setting packs 8
+irrelevant paragraphs around 2 gold ones, and a small model is easily pulled
+off by them.
+
+**Confound ruled out:** no prompt was truncated. Full-context prompts ran a mean
+of 1,395 tokens and a maximum of 2,365, against a 3,072 limit — so the
+full-context arm was intact and the result is not a truncation artifact.
+
+## The significance tests do not support the headline
+
+Paired bootstrap on mean F1 (20,000 resamples) and McNemar's exact test on
+exact match, n=150 at 80% compression:
+
+| Comparison | ΔF1 | p (bootstrap) | McNemar b/c | p (exact) |
+|---|---|---|---|---|
+| pruned vs full | +0.0307 | **0.373** | 16/10 | 0.327 |
+| pruned vs random | +0.0645 | **0.065** | 18/10 | 0.185 |
+| random vs full | −0.0338 | 0.253 | 8/10 | 0.815 |
+
+**None of these reach significance.** "Pruning beats full context" carries
+p=0.373 — the study is underpowered at n=150, where a 3-point F1 gap is well
+inside the noise. Even pruned-vs-random, the comparison most likely to be real,
+only reaches p=0.065.
+
+What *is* reassuring: the direction replicated across two independent runs at
+different numerical precision (fp32 and fp16), with pruned F1 of 0.3193 both
+times and full-context F1 of 0.2919 and 0.2886. Consistent, but consistency is
+not significance.
+
+**The honest statement:** at 80% token reduction this pruner shows no measurable
+loss in answer quality, and possibly a gain, but n=150 cannot establish the
+gain. Settling it needs a larger sample and a stronger reader — a 494M model is
+unusually distractible, so the benefit may shrink on a capable one.
+
+## Cost
+
+| Quantity | Value |
+|---|---|
+| Pruning | 0.18 ms per document per method |
+| Embedding | 37.8 ms per document (MiniLM-L6-v2, Apple MPS) |
+| Tokens saved | 995 of 1,239 per query at 80% compression |
